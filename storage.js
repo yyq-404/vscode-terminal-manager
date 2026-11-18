@@ -75,7 +75,7 @@ class Storage {
         return this.index.get(id);
     }
 
-    addItem(item, parentId = null) {
+    addItem(item, parentId = null, index) {
         const node = {
             ...item,
             id: item.id || generateId(),
@@ -84,7 +84,12 @@ class Storage {
         if (node.type === 'group' && !Array.isArray(node.children)) {
             node.children = [];
         }
-        this._getSiblings(parentId).push(node);
+        const siblings = this._getSiblings(parentId);
+        if (typeof index === 'number' && index >= 0 && index < siblings.length) {
+            siblings.splice(index, 0, node);
+        } else {
+            siblings.push(node);
+        }
         this.index.set(node.id, node);
         if (node.children) {
             this._indexTree(node.children);
@@ -153,6 +158,28 @@ class Storage {
         to.splice(insertAt, 0, node);
         this.save();
         return true;
+    }
+
+    snapshot(node) {
+        const [out] = this._serialize([node]);
+        return out;
+    }
+
+    cloneSnapshot(snapshot, parentId = null) {
+        const stripped = this._stripIds(JSON.parse(JSON.stringify(snapshot)));
+        const [node] = this._normalize([stripped], parentId);
+        return node;
+    }
+
+    _stripIds(item) {
+        if (!item || typeof item !== 'object') {
+            return item;
+        }
+        const { id, parentId, children, ...rest } = item;
+        if (Array.isArray(children)) {
+            rest.children = children.map((child) => this._stripIds(child));
+        }
+        return rest;
     }
 
     siblingIndex(id) {

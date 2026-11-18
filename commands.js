@@ -12,6 +12,20 @@ function parentIdOf(item) {
     return item.type === 'group' ? item.id : item.parentId || null;
 }
 
+function uniqueCopyLabel(base, siblings) {
+    const names = new Set((siblings || []).map((item) => item.label));
+    if (!names.has(base)) {
+        return base;
+    }
+    let label = `${base} copy`;
+    let n = 2;
+    while (names.has(label)) {
+        label = `${base} copy ${n}`;
+        n += 1;
+    }
+    return label;
+}
+
 class TerminalManager {
     constructor(context) {
         this.context = context;
@@ -23,6 +37,7 @@ class TerminalManager {
         this.editor = new Editor(this);
         this._clickTimer = undefined;
         this._lastClick = undefined;
+        this._clipboard = undefined;
     }
 
     createDndController() {
@@ -168,6 +183,8 @@ class TerminalManager {
             ['terminalManager.addGroup', (item) => this.addGroup(item)],
             ['terminalManager.editItem', (item) => this.editItem(item)],
             ['terminalManager.deleteItem', (item) => this.deleteItem(item)],
+            ['terminalManager.copyItem', (item) => this.copyItem(item)],
+            ['terminalManager.pasteItem', (item) => this.pasteItem(item)],
             ['terminalManager.moveItem', (item) => this.moveItem(item)],
             ['terminalManager.openTerminal', (item) => this.openTerminal(item)],
             ['terminalManager.onTerminalClick', (item) => this.onTerminalClick(item)],
@@ -339,6 +356,54 @@ class TerminalManager {
 
     moveItem(item) {
         this.editItem(item);
+    }
+
+    copyItem(item) {
+        if (!this.ensureWorkspace()) {
+            return;
+        }
+        if (!item && this.treeView && this.treeView.selection.length) {
+            item = this.treeView.selection[0];
+        }
+        if (!item || !item.id) {
+            vscode.window.showInformationMessage('Select a terminal or group to copy.');
+            return;
+        }
+        const live = this.storage.findById(item.id) || item;
+        this._clipboard = this.storage.snapshot(live);
+    }
+
+    pasteItem(item) {
+        if (!this.ensureWorkspace()) {
+            return;
+        }
+        if (!this._clipboard) {
+            vscode.window.showInformationMessage('Nothing to paste.');
+            return;
+        }
+        if (!item && this.treeView && this.treeView.selection.length) {
+            item = this.treeView.selection[0];
+        }
+
+        let parentId = null;
+        let index;
+        if (item && item.type === 'group') {
+            parentId = item.id;
+            const group = this.storage.findById(item.id) || item;
+            index = (group.children || []).length;
+        } else if (item && item.id) {
+            parentId = item.parentId || null;
+            const at = this.storage.siblingIndex(item.id);
+            index = at < 0 ? undefined : at + 1;
+        }
+
+        const clone = this.storage.cloneSnapshot(this._clipboard, parentId);
+        const siblings = parentId
+            ? ((this.storage.findById(parentId) || {}).children || [])
+            : this.storage.getRoots();
+        clone.label = uniqueCopyLabel(clone.label, siblings);
+        this.storage.addItem(clone, parentId, index);
+        this.tree.refresh();
     }
 
     onTerminalClick(item) {

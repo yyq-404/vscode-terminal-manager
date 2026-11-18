@@ -90,6 +90,18 @@
 				"icon": "$(trash)"
 			},
 			{
+				"command": "terminalManager.copyItem",
+				"title": "Copy",
+				"category": "Terminal Manager",
+				"icon": "$(copy)"
+			},
+			{
+				"command": "terminalManager.pasteItem",
+				"title": "Paste",
+				"category": "Terminal Manager",
+				"icon": "$(paste)"
+			},
+			{
 				"command": "terminalManager.moveItem",
 				"title": "Move to Group",
 				"category": "Terminal Manager",
@@ -132,6 +144,20 @@
 					"dark": "resources/edit.png",
 					"light": "resources/edit.png"
 				}
+			}
+		],
+		"keybindings": [
+			{
+				"command": "terminalManager.copyItem",
+				"key": "ctrl+c",
+				"mac": "cmd+c",
+				"when": "focusedView == terminal-manager"
+			},
+			{
+				"command": "terminalManager.pasteItem",
+				"key": "ctrl+v",
+				"mac": "cmd+v",
+				"when": "focusedView == terminal-manager"
 			}
 		],
 		"menus": {
@@ -187,6 +213,16 @@
 					"command": "terminalManager.editItem",
 					"when": "view == terminal-manager",
 					"group": "2_modify"
+				},
+				{
+					"command": "terminalManager.copyItem",
+					"when": "view == terminal-manager",
+					"group": "3_clip"
+				},
+				{
+					"command": "terminalManager.pasteItem",
+					"when": "view == terminal-manager",
+					"group": "3_clip"
 				},
 				{
 					"command": "terminalManager.moveItem",
