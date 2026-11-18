@@ -2,14 +2,14 @@
 	"name": "terminal-manager",
 	"displayName": "Terminal Manager",
 	"description": "Choose which terminal to use in single click and switch between multiple terminals. ",
-	"version": "1.0.6",
+	"version": "1.1.0",
 	"publisher": "saurabh",
 	"author": {
 		"name": "saurabhdaware"
 	},
 	"icon": "resources/icon.png",
 	"engines": {
-		"vscode": "^1.34.0"
+		"vscode": "^1.66.0"
 	},
 	"categories": [
 		"Other"
@@ -32,43 +32,186 @@
 		"Windows Terminal"
 	],
 	"activationEvents": [
-		"onView:terminal-manager"
+		"onView:terminal-manager",
+		"onCommand:terminalManager.addTerminal",
+		"onCommand:terminalManager.addGroup",
+		"onCommand:terminalManager.editJson",
+		"onCommand:extension.editTerminals"
 	],
 	"main": "./extension.js",
 	"contributes": {
 		"viewsContainers": {
-            "activitybar": [
-                {
-                    "id": "terminal-manager",
-                    "title": "Terminal Manager",
-                    "icon": "resources/terminal.png"
-                }
-            ]
+			"activitybar": [
+				{
+					"id": "terminal-manager",
+					"title": "Terminal Manager",
+					"icon": "resources/terminal.png"
+				}
+			]
 		},
 		"views": {
-            "terminal-manager": [
-                {
-                    "id": "terminal-manager",
-                    "name": "Terminals"
-                }
-            ]
-        },
+			"terminal-manager": [
+				{
+					"id": "terminal-manager",
+					"name": "Terminals",
+					"icon": "resources/terminal.png"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "terminal-manager",
+				"contents": "[Add Group](command:terminalManager.addGroup)\n[Add Terminal](command:terminalManager.addTerminal)"
+			}
+		],
 		"commands": [
+			{
+				"command": "terminalManager.addTerminal",
+				"title": "Add Terminal",
+				"category": "Terminal Manager",
+				"icon": "$(plus)"
+			},
+			{
+				"command": "terminalManager.addGroup",
+				"title": "Add Group",
+				"category": "Terminal Manager",
+				"icon": "$(new-folder)"
+			},
+			{
+				"command": "terminalManager.editItem",
+				"title": "Edit",
+				"category": "Terminal Manager",
+				"icon": "$(edit)"
+			},
+			{
+				"command": "terminalManager.deleteItem",
+				"title": "Delete",
+				"category": "Terminal Manager",
+				"icon": "$(trash)"
+			},
+			{
+				"command": "terminalManager.moveItem",
+				"title": "Move to Group",
+				"category": "Terminal Manager",
+				"icon": "$(fold-down)"
+			},
+			{
+				"command": "terminalManager.openTerminal",
+				"title": "Open Terminal",
+				"category": "Terminal Manager",
+				"icon": "$(terminal)"
+			},
+			{
+				"command": "terminalManager.expandAll",
+				"title": "Expand All",
+				"category": "Terminal Manager",
+				"icon": "$(expand-all)"
+			},
+			{
+				"command": "terminalManager.collapseAll",
+				"title": "Collapse All",
+				"category": "Terminal Manager",
+				"icon": "$(collapse-all)"
+			},
+			{
+				"command": "terminalManager.refresh",
+				"title": "Refresh",
+				"category": "Terminal Manager",
+				"icon": "$(refresh)"
+			},
+			{
+				"command": "terminalManager.editJson",
+				"title": "Edit JSON",
+				"category": "Terminal Manager",
+				"icon": "$(json)"
+			},
 			{
 				"command": "extension.editTerminals",
 				"title": "Edit Terminals",
-				"icon":{
+				"icon": {
 					"dark": "resources/edit.png",
 					"light": "resources/edit.png"
 				}
 			}
 		],
-		"menus":{
+		"menus": {
 			"view/title": [
 				{
-					"command":"extension.editTerminals",
-					"when":"view == terminal-manager",
-					"group":"navigation"
+					"command": "terminalManager.addTerminal",
+					"when": "view == terminal-manager",
+					"group": "navigation@1"
+				},
+				{
+					"command": "terminalManager.addGroup",
+					"when": "view == terminal-manager",
+					"group": "navigation@2"
+				},
+				{
+					"command": "terminalManager.expandAll",
+					"when": "view == terminal-manager",
+					"group": "navigation@3"
+				},
+				{
+					"command": "terminalManager.collapseAll",
+					"when": "view == terminal-manager",
+					"group": "navigation@4"
+				},
+				{
+					"command": "terminalManager.refresh",
+					"when": "view == terminal-manager",
+					"group": "navigation@5"
+				},
+				{
+					"command": "terminalManager.editJson",
+					"when": "view == terminal-manager",
+					"group": "navigation@6"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "terminalManager.openTerminal",
+					"when": "view == terminal-manager && viewItem == terminal",
+					"group": "0_open"
+				},
+				{
+					"command": "terminalManager.addTerminal",
+					"when": "view == terminal-manager && viewItem == group",
+					"group": "1_new"
+				},
+				{
+					"command": "terminalManager.addGroup",
+					"when": "view == terminal-manager && viewItem == group",
+					"group": "1_new"
+				},
+				{
+					"command": "terminalManager.editItem",
+					"when": "view == terminal-manager",
+					"group": "2_modify"
+				},
+				{
+					"command": "terminalManager.moveItem",
+					"when": "view == terminal-manager",
+					"group": "2_modify"
+				},
+				{
+					"command": "terminalManager.deleteItem",
+					"when": "view == terminal-manager",
+					"group": "7_delete"
+				},
+				{
+					"command": "terminalManager.addTerminal",
+					"when": "view == terminal-manager && viewItem == group",
+					"group": "inline@1"
+				},
+				{
+					"command": "terminalManager.editItem",
+					"when": "view == terminal-manager",
+					"group": "inline@2"
+				},
+				{
+					"command": "terminalManager.deleteItem",
+					"when": "view == terminal-manager",
+					"group": "inline@3"
 				}
 			]
 		}

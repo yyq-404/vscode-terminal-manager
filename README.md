@@ -2,7 +2,7 @@
 
 Terminal Manager is a visual studio code extension to switch between various terminals.
 
-[![Current version of Terminal Manager](https://vsmarketplacebadge.apphb.com/version-short/saurabh.terminal-manager.svg)](https://marketplace.visualstudio.com/items?itemName=saurabh.terminal-manager) [![Current version of Terminal Manager](https://vsmarketplacebadge.apphb.com/downloads/saurabh.terminal-manager.svg)](https://marketplace.visualstudio.com/items?itemName=saurabh.terminal-manager) [![Current version of Terminal Manager](https://vsmarketplacebadge.apphb.com/rating-short/saurabh.terminal-manager.svg)](https://marketplace.visualstudio.com/items?itemName=saurabh.terminal-manager)
+[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=saurabh.terminal-manager)
 
 [![Install extension button](https://res.cloudinary.com/saurabhdaware/image/upload/v1564401766/saurabhdaware.in/otherAssets/iebutton.png)](https://marketplace.visualstudio.com/items?itemName=saurabh.terminal-manager)
 
@@ -10,31 +10,72 @@ Terminal Manager is a visual studio code extension to switch between various ter
 
 By default vscode lets us define only one link of terminal from settings.
 
-Using this extension you can provide an array of terminals and then you can switch between them from a new Terminal icon in activity bar.
+Using this extension you can provide an array of terminals (optionally nested in groups) and then you can switch between them from a new Terminal icon in activity bar.
+
+- Click a terminal in the sidebar to open it
+- Group terminals in a nested tree
+- Add, edit, delete, and move items from the UI — no JSON required
+- Config is stored per project at `.vscode/terminals.json`
+- JSON editing is still available for bulk changes
 
 ![](screenshots/ss1.png)
 ![](screenshots/ss2.png)
 
+## Manage terminals from the UI
+
+Open the **Terminal Manager** view in the activity bar:
+
+| Action | Where |
+| --- | --- |
+| Add Terminal | `+` in the view title, or on a group |
+| Add Group | New folder icon in the view title, or on a group |
+| Edit | Hover an item and click the pencil, or right-click → Edit |
+| Delete | Hover an item and click the trash, or right-click → Delete |
+| Move | Right-click → Move to Group |
+| Edit JSON | JSON icon in the view title |
+
+Clicking a group’s `+` adds the new terminal (or nested group) inside that group.
+
+Add, edit, move, and delete all open an **editor tab** with every field on one form (name, shell, arguments, working directory, group). Save writes `.vscode/terminals.json`.
+
 ## Extension Settings
 
-Click the edit icon ![](resources/edit.png) in Terminal Manager activity bar to edit the terminal settings.
+Config lives in the current project: **`.vscode/terminals.json`**.
 
-Here's what sample terminals.json looks like. (Note : Ubuntu configs will only work if you have wsl installed in your windows)
+Click the JSON icon in the Terminal Manager activity bar to edit it directly. The file is created automatically when you add the first terminal or group.
+
+Old flat arrays still work and are migrated on first load. Groups use `"type": "group"` and a `children` array.
 
 ### In Windows :
 ```json
 [
     {
-        "label":"Windows",
-        "shellPath":"C://Windows//System32//cmd.exe",
-        "shellArgs":[
-            "/K",
-            "echo Heya!"
+        "type": "group",
+        "label": "Windows",
+        "children": [
+            {
+                "type": "terminal",
+                "label": "CMD",
+                "shellPath": "C://Windows//System32//cmd.exe",
+                "shellArgs": ["/K", "echo Heya!"]
+            },
+            {
+                "type": "terminal",
+                "label": "PowerShell",
+                "shellPath": "C://Windows//System32//WindowsPowerShell//v1.0//powershell.exe"
+            }
         ]
     },
     {
-        "label":"Ubuntu",
-        "shellPath":"C://Windows//System32//bash.exe"
+        "type": "group",
+        "label": "Linux",
+        "children": [
+            {
+                "type": "terminal",
+                "label": "Ubuntu",
+                "shellPath": "C://Windows//System32//bash.exe"
+            }
+        ]
     }
 ]
 ```
@@ -43,17 +84,21 @@ Here's what sample terminals.json looks like. (Note : Ubuntu configs will only w
 ```json
 [
     {
-        "label":"Login bash",
-        "shellPath":"/bin/bash",
-        "shellArgs":["-l"]
-    },
-    {
-        "label": "Restricted Bash",
-        "shellPath": "/bin/rbash"
-    },
-    {
-        "label":"sh",
-        "shellPath":"/bin/sh"
+        "type": "group",
+        "label": "Shells",
+        "children": [
+            {
+                "type": "terminal",
+                "label": "Login bash",
+                "shellPath": "/bin/bash",
+                "shellArgs": ["-l"]
+            },
+            {
+                "type": "terminal",
+                "label": "sh",
+                "shellPath": "/bin/sh"
+            }
+        ]
     }
 ]
 ```
@@ -73,6 +118,13 @@ Here's what sample terminals.json looks like. (Note : Ubuntu configs will only w
 - Open the project in Visual Studio Code and press `Ctrl + f5` to start Extension host.
 
 ## Release Notes
+
+### 1.1.0
+
+- Nested tree groups for terminals
+- Add, edit, delete, and move terminals/groups from the sidebar UI
+- Config stored in the project at `.vscode/terminals.json`
+- Existing flat `terminals.json` files are migrated automatically
 
 ### 1.0.0 - 1.0.4
 

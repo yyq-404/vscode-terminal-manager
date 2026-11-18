@@ -6,6 +6,10 @@ vsc-extension-quickstart.md
 **/jsconfig.json
 **/*.map
 **/.eslintrc.json
-screenshots
-archive
+.gitignore
+vsc-extension-quickstart.md
 PAT.txt
+.claude/**
+**/*.vsix
+node_modules/**
+package-lock.json
